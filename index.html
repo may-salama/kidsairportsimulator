@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Airport Arcade Game</title>
+    <style>
+        /* Basic styling for the body */
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            background: #333;
+            color: #fff;
+        }
+
+        /* Container for the game */
+        #gameContainer {
+            width: 800px;
+            height: 400px;
+            position: relative;
+            margin: 20px auto;
+            border: 4px solid #000;
+            overflow: hidden;
+            background: linear-gradient(to bottom, #d3d3d3 70%, #555555 30%);
+        }
+
+        /* Styling for the ticket display */
+        #ticket.flight-ticket {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 100px;
+            height: 150px;
+            background: linear-gradient(to bottom right, #f0f0f0, #ffffff);
+            color: #000;
+            border: 1px solid #333;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        .ticket-header {
+            width: 100%;
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 4px 0;
+            font-size: 10px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .ticket-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            padding: 8px;
+        }
+
+        .ticket-label {
+            font-size: 8px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        .ticket-gate {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+        }
+
+        .ticket-footer {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            padding: 8px 0;
+            background-color: #f0f0f0;
+        }
+
+        .plane-icon {
+            width: 40px;
+            height: 40px;
+            opacity: 0.6;
+        }
+
+        /* Styling for check-in desk */
+        .check-in-desk {
+            width: 250px; /* Width to fit naturally within the game container */
+            height: 500px; /* Height scaled proportionally */
+            background-image: url('apcheckin.png');
+            background-size: contain; /* Preserve the aspect ratio */
+            background-repeat: no-repeat; /* Avoid tiling the image */
+            background-position: center; /* Center the image */
+            position: absolute;
+            right: 170px; /* Adjust spacing to the left of the flight ticket */
+            bottom: -60px; /* Align the bottom of the desk with the floor */
+            cursor: pointer;
+            border: none; 
+        }
+
+        /* Specific styling for metal detector */
+        .metal-detector {
+            width: 200px; /* Width to match check-in desk */
+            height: 400px; /* Height to match check-in desk */
+            background-image: url('apsecurity.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            position: absolute;
+            right: 210px; /* Same positioning as check-in desk */
+            bottom: -10px; /* Same positioning as check-in desk */
+            cursor: pointer;
+            border: none;
+        }
+
+        /* Common styling for gates */
+        .gate {
+            width: 150px; /* Adjusted to match previous gate image sizing */
+            height: 300px; /* Adjusted to match previous gate image sizing */
+            position: absolute;
+            bottom: 80px; /* Stretch to bottom of container */
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            cursor: pointer;
+            border: none;
+            color: transparent; /* Hide text */
+        }
+
+        /* Specific positioning for each gate */
+        #gate1 { 
+            left: 150px; 
+            background-image: url('apgate1.png');
+        }
+        #gate2 { 
+            left: 350px; 
+            background-image: url('apgate2.png');
+        }
+        #gate3 { 
+            left: 550px; 
+            background-image: url('apgate3.png');
+        }
+
+        /* Styling for the player */
+        #player {
+            width: 60px;  
+            height: 120px;  
+            position: absolute;
+            top: 180px;
+            left: 50px;
+            background-image: url('apperson.png');
+            background-size: contain;  
+            background-position: center;
+            background-repeat: no-repeat;
+            border-radius: 5px;
+        }
+
+        /* Styling for the suitcase */
+        .suitcase {
+            width: 50px;  
+            height: 40px; 
+            position: absolute;
+            background-image: url('apsuitcase.png');
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-radius: 3px;
+        }
+
+        /* Styling for the game status display */
+        #gameStatus {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #fff;
+            color: #000;
+            padding: 20px;
+            border: 2px solid #000;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <!-- Display for the ticket and gate number -->
+        <div id="ticket" class="flight-ticket">
+            <div class="ticket-header">FLIGHT TICKET</div>
+            <div class="ticket-content">
+                <div class="ticket-label">Gate</div>
+                <div id="gateNumber" class="ticket-gate"></div>
+            </div>
+            <div class="ticket-footer">
+                <svg class="plane-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M50 20 L30 60 L70 60 Z" fill="#333"/>
+                    <path d="M40 60 L50 80 L60 60" fill="#666"/>
+                </svg>
+            </div>
+        </div>        <!-- Player character -->
+        <div id="player"></div>
+        <!-- Suitcase -->
+        <div class="suitcase"></div>
+        <!-- Check-in desk -->
+        <div class="check-in-desk" id="checkInDesk" onclick="checkIn()"></div>
+        <!-- Metal detector -->
+        <div class="metal-detector" id="metalDetector" style="display: none;" onclick="passSecurity()"></div>
+        <!-- Gates -->
+        <div class="gate" id="gate1" style="display: none;" onclick="checkGate(1)"></div>
+        <div class="gate" id="gate2" style="display: none;" onclick="checkGate(2)"></div>
+        <div class="gate" id="gate3" style="display: none;" onclick="checkGate(3)"></div>
+        <!-- Game status display -->
+        <div id="gameStatus">
+            <h2 id="statusText"></h2>
+            <button onclick="resetGame()">Play Again</button>
+        </div>
+    </div>
+    <script>
+        // Get references to game elements
+        const player = document.getElementById('player');
+        const suitcase = document.querySelector('.suitcase');
+        const checkInDesk = document.getElementById('checkInDesk');
+        const metalDetector = document.getElementById('metalDetector');
+        const gates = [
+            document.getElementById('gate1'),
+            document.getElementById('gate2'),
+            document.getElementById('gate3')
+        ];
+        const gameStatus = document.getElementById('gameStatus');
+        const statusText = document.getElementById('statusText');
+        const gateNumberDisplay = document.getElementById('gateNumber');
+
+        // Initialize game state variables
+        let playerPos = { x: 50, y: 180 };
+        let suitcasePos = { 
+            x: playerPos.x + 2, // Align suitcase near the player's arm
+            y: playerPos.y + 87 // Align suitcase near the player's lower body
+        };
+        let hasSuitcase = true;
+        let currentStage = 1;
+        let currentGate = Math.floor(Math.random() * 3) + 1;
+
+        // Function to update positions of player and suitcase
+        function updatePositions() {
+            player.style.left = playerPos.x + 'px';
+            player.style.top = playerPos.y + 'px';
+            suitcase.style.left = suitcasePos.x + 'px';
+            suitcase.style.top = suitcasePos.y + 'px';
+        }
+
+        // Function to handle check-in process
+        function checkIn() {
+            if (currentStage === 1) {
+                alert("Check-in complete!");
+                currentStage = 2;
+                checkInDesk.style.display = 'none';
+                metalDetector.style.display = 'block';
+            }
+        }
+
+        // Function to handle passing through the metal detector
+        function passSecurity() {
+            if (currentStage === 2) {
+                alert("You passed the metal detector!");
+                currentStage = 3;
+                metalDetector.style.display = 'none';
+                gates.forEach(gate => gate.style.display = 'block');
+            }
+        }
+
+        // Function to check if the player is at the correct gate
+        function checkGate(gateNumber) {
+            if (currentStage === 3) {
+                if (!hasSuitcase) {
+                    endGame("⚠ You forgot your suitcase!");
+                    return;
+                }
+                if (gateNumber === currentGate) {
+                    endGame("🎉 You made it to the right gate!");
+                } else {
+                    endGame("❌ Wrong gate! Your flight left without you!");
+                }
+            }
+        }
+
+        // Function to end the game and display the result
+        function endGame(message) {
+            gameStatus.style.display = 'block';
+            statusText.textContent = message;
+        }
+
+        // Function to reset the game to its initial state
+        function resetGame() {
+            currentStage = 1;
+            hasSuitcase = true;
+            currentGate = Math.floor(Math.random() * 3) + 1;
+            gateNumberDisplay.textContent = currentGate;
+            checkInDesk.style.display = 'block';
+            metalDetector.style.display = 'none';
+            gates.forEach(gate => gate.style.display = 'none');
+            gameStatus.style.display = 'none';
+
+            // Reset player position
+            playerPos = { x: 50, y: 180 };
+
+            // Align suitcase with the player dynamically
+            suitcasePos.x = playerPos.x + 2;
+            suitcasePos.y = playerPos.y + 87;
+
+            updatePositions();
+        }
+
+        // Event listener for keyboard controls
+        document.addEventListener('keydown', (e) => {
+            const step = 5; // Movement step size
+            const jumpHeight = 50; // Height of the jump
+            const jumpSpeed = 200; // Duration of the jump in milliseconds
+            let isJumping = false; // Prevent multiple jumps simultaneously
+
+            switch (e.key) {
+                case 'ArrowLeft':
+                    // Move left, but keep vertical position constant
+                    playerPos.x = Math.max(0, playerPos.x - step);
+                    break;
+                case 'ArrowRight':
+                    // Move right, but keep vertical position constant
+                    playerPos.x = Math.min(770, playerPos.x + step);
+                    break;
+                case 'ArrowUp':
+                    if (!isJumping) {
+                        isJumping = true;
+                        const originalY = playerPos.y;
+                        const jumpStart = Date.now();
+
+                        function animateJump() {
+                            const elapsed = Date.now() - jumpStart;
+                            if (elapsed < jumpSpeed / 2) {
+                                // Rising phase
+                                playerPos.y = originalY - (jumpHeight * (elapsed / (jumpSpeed / 2)));
+                            } else if (elapsed < jumpSpeed) {
+                                // Falling phase
+                                playerPos.y = originalY - jumpHeight + (jumpHeight * ((elapsed - jumpSpeed / 2) / (jumpSpeed / 2)));
+                            } else {
+                                // End of jump
+                                playerPos.y = originalY;
+                                isJumping = false;
+                                updatePositions();
+                                return;
+                            }
+                            updatePositions();
+                            requestAnimationFrame(animateJump);
+                        }
+
+                        requestAnimationFrame(animateJump);
+                    }
+                    break;
+                case 's':
+                    // Toggle suitcase
+                    hasSuitcase = !hasSuitcase;
+                    break;
+            }
+
+            // Update suitcase position to always align with the player
+            suitcasePos.x = hasSuitcase ? playerPos.x + 2 : suitcasePos.x;
+            suitcasePos.y = hasSuitcase ? playerPos.y + 87 : suitcasePos.y;
+
+            updatePositions();
+        });
+
+        // Initialize the game
+        gateNumberDisplay.textContent = currentGate;
+        updatePositions();
+    </script>
+</body>
+</html>
