@@ -106,6 +106,7 @@
             bottom: -60px; /* Align the bottom of the desk with the floor */
             cursor: pointer;
             border: none; 
+            z-index: 10; /* Ensure desk is on top of gates */
         }
 
         /* Specific styling for metal detector */
@@ -121,6 +122,7 @@
             bottom: -10px; /* Same positioning as check-in desk */
             cursor: pointer;
             border: none;
+            z-index: 10; /* Ensure metal-detector is on top of gates */
         }
 
         /* Common styling for gates */
@@ -129,6 +131,7 @@
             height: 300px; /* Adjusted to match previous gate image sizing */
             position: absolute;
             bottom: 80px; /* Stretch to bottom of container */
+            z-index: 1; /* Lower z-index to place behind player */
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
@@ -163,6 +166,7 @@
             background-position: center;
             background-repeat: no-repeat;
             border-radius: 5px;
+            z-index: 10; /* Ensure player is on top of gates */
         }
 
         /* Styling for the suitcase */
@@ -175,6 +179,7 @@
             background-position: center;
             background-repeat: no-repeat;
             border-radius: 3px;
+            z-index: 10; /* Ensure suitcase is on top of gates */
         }
 
         /* Styling for the game status display */
@@ -190,6 +195,7 @@
             border-radius: 10px;
             text-align: center;
             display: none;
+            z-index: 100; /* On top of all other elements */
         }
     </style>
 </head>
